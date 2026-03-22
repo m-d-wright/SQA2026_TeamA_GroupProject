@@ -5,6 +5,7 @@ obj/
 [Bb]uild/
 [Bb]uild[Ll]og*.*
 artifacts/
+TestResult/
 *.trx
 *.coverage
 *.coveragexml
