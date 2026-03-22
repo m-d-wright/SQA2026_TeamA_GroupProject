@@ -1,0 +1,123 @@
+# Build output
+bin/
+obj/
+[Ll]og/
+[Bb]uild/
+[Bb]uild[Ll]og*.*
+artifacts/
+*.trx
+*.coverage
+*.coveragexml
+*.gcov
+*.gcov.json
+
+# .NET tooling
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+.nuget/packages/
+packages/
+*.nupkg
+*.snupkg
+# Prevent committing restored packages; allow checked-in packages when needed:
+!packages/build/
+!packages/repositories.config
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.userprefs
+
+# Visual Studio
+.vs/
+.vscode/
+.vsconfig
+.vscode/*.suo
+*.psess
+*.vsp
+*.vspx
+*.vsmdi
+*.cache
+*.dbmdl
+*.opendb
+*.VC.db
+*.vcxproj.user
+
+# Rider / IntelliJ
+.idea/
+*.sln.iml
+
+
+# ASP.NET / IIS
+App_Data/
+aspnet_client/
+iisexpress.log
+IISExpress/
+.webpubxml
+.scafparams
+
+# Configuration secrets (use dotnet user-secrets instead)
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# Certificates
+*.pfx
+*.p12
+*.cer
+*.key
+
+# Azure / Cloud
+PublishProfiles/
+.terraform/
+*.tfstate
+*.tfstate.*
+
+
+# Coverage tools
+coverage/
+coverage-results/
+.coverage
+.coveragexml
+lcov.info
+
+# Package managers
+node_modules/
+npm-debug.log*
+yarn-error.log
+pnpm-lock.yaml
+
+# Editor swap/backup files
+*~
+*.swp
+*.swn
+*.swo
+*.tmp
+*.bak
+
+# Containers and local dev
+.env
+.env.*
+!.env.example
+
+# Images and generated assets
+*.exe
+*.dll
+*.pdb
+*.mdb
+*.pidb
+*.cache
+*.mpack
+
+# Style/formatting caches
+.stylecop/
+.editorconfig.user
+
+# Local tools
+.dotnet-tools/
