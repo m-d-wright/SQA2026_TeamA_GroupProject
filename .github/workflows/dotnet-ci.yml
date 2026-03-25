@@ -14,6 +14,11 @@ jobs:
         working-directory: ./
     steps:
     - uses: actions/checkout@v4
+    # CodeQL Security Scan
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with: 
+        languages: csharp
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -24,11 +29,5 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --filter FullyQualifiedName~Tests.Unit --no-build --verbosity normal
-
-    # CodeQL Security Scan
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with: 
-        languages: csharp
     - name: Analyze CodeQL
       uses: github/codeql-action/analyze@v3
