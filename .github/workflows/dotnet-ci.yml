@@ -26,6 +26,9 @@ jobs:
       run: dotnet test --filter FullyQualifiedName~Tests.Unit --no-build --verbosity normal
 
     # CodeQL Security Scan
-    - uses: github/codeql-action/init@v3
-    with: { languages: csharp }
-    - uses: github/codeql-action/analyze@v3
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with: 
+        languages: csharp
+    - name: Analyze CodeQL
+      uses: github/codeql-action/analyze@v3
