@@ -26,15 +26,17 @@ namespace Bank4Us.Transaction
 
     public sealed record AccountHolder(string Name, int Age);
 
-    public sealed record Account
+    public sealed class Account
     {
         public AccountType AccountType {get; init;} = AccountType.Checking;
 
         public AccountHolder? AccountHolder {get; init;}
+
+        public int Balance {get; set;} = 0;
         
     }
 
-    public sealed record Transfer(TransferType Type, Account Source, Account Destination, int amount);
+    public sealed record Transfer(TransferType Type, Account Account, int amount);
 
     public sealed record TransferError(string message);
 
