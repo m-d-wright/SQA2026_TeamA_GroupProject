@@ -1,5 +1,6 @@
-﻿using Bank4Us.AccountOpening;
 using NSubstitute;
+using Bank4Us.AccountOpening;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace unit;
 
@@ -87,10 +88,97 @@ public class AccountOpeningTests
         }
     }
 
-
+    /* Test T1 */
     [Fact]
-    public void EvaluateCitizenship_PermanentResident_StatusNeedsExtraVerification()
+    public void ValidateIdentificationNumber_ValidSSN_StatusApproved()
     {
-        Assert.Equal(0,1);
+        // Arrange
+        // TODO: Replace with MockWorkflowFactory and ApplicantBuilder for Green
+        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        Applicant applicant = ApplicantFactory.CreateValid();
+        // SUT
+        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
+
+        // Act
+        ProcessResult processResult = sut.Run(applicant);
+
+        // Assert - Expected SUT behavior
+        Assert.NotNull(processResult);
+        Assert.Empty(processResult.Errors);
+        Assert.Equal(ApplicationStatus.Approved, processResult.Status);
     }
+
+    /* Test T2 */
+    [Fact]
+    public void ValidateIdentificationNumber_InvalidSSN_ValidationErrorInvalidFormat()
+    {
+
+        // Arrange
+        ValidationError invalidIdError = new ValidationError("Invalid SSN format"); // Exact expected from reqs
+        Applicant applicant = new ApplicantBuilder().SetIDNumber("FAKE-SSN-NUM").Build();
+        // TODO: Replace with MockWorkflowFactory for Green
+        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        // SUT
+        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
+
+        // Act
+        ProcessResult processResult = sut.Run(applicant);
+
+        // Assert - Expected SUT behavior
+        Assert.NotNull(processResult);
+        Assert.NotEmpty(processResult.Errors);
+        Assert.Equal(invalidIdError, processResult.Errors[0]);
+        Assert.Equal(ApplicationStatus.Incomplete, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).ValidateIdentificationNumber(applicant);
+        accountWorkFlow.DidNotReceive().ValidateAddress(applicant);
+
+    }
+
+    /* Test T3 and Test T4 */
+    [Theory]
+    [InlineData(200)]
+    [InlineData(201)]
+    public void Process_OpeningDepositGreaterEqual200_StatusApproved(int depositAmount)
+    {
+        // Arrange
+        Applicant applicant = new ApplicantBuilder().SetOpeningDeposit(depositAmount).Build();
+        // TODO: Replace with MockWorkflowFactory for Green
+        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+
+        // SUT
+        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
+
+        // Act
+        ProcessResult processResult = sut.Run(applicant);
+
+        //Assert
+        Assert.NotNull(processResult);
+        Assert.Empty(processResult.Errors);
+        Assert.Equal(ApplicationStatus.Approved, processResult.Status);
+    }
+
+    /* Test T5*/
+    [Fact]
+    public void Process_OpeningDepositBelow200_StatusCancelled()
+    {
+        // Arrange
+        int depositAmount = 199; // BVA
+        Applicant applicant = new ApplicantBuilder().SetOpeningDeposit(depositAmount).Build();
+        // TODO: Replace with MockWorkflowFactory for Green
+        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+
+        // SUT
+        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
+
+        // Act
+        ProcessResult processResult = sut.Run(applicant);
+
+        //Assert
+        Assert.NotNull(processResult);
+        Assert.NotEmpty(processResult.Errors);
+        Assert.Equal(ApplicationStatus.Cancelled, processResult.Status);
+    }
+
 }
