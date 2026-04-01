@@ -15,7 +15,7 @@ namespace Bank4Us.Transaction
     public enum TransferType
     {
         Deposit,
-        Withdrawal
+        Withdraw
     }
 
     public enum AccountType
@@ -54,7 +54,7 @@ namespace Bank4Us.Transaction
     public interface ITransferWorkflow
     {
         TransferResult Deposit(Transfer transfer);
-        TransferResult Withdrawal(Transfer transfer);
+        TransferResult Withdraw(Transfer transfer);
     }
 
 
@@ -72,9 +72,9 @@ namespace Bank4Us.Transaction
             if (transfer.Type == TransferType.Deposit) {
                 return _workflow.Deposit(transfer);
             }
-            else if (transfer.Type == TransferType.Withdrawal)
+            else if (transfer.Type == TransferType.Withdraw)
             {
-                return _workflow.Withdrawal(transfer);
+                return _workflow.Withdraw(transfer);
             }
             else
             {

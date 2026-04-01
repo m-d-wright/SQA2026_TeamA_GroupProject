@@ -11,9 +11,12 @@ public class TransactionTests
     public void Transfer_DepositAboveZero_StatusApproved()
     {
         // Arrange
-        Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account (), 1);
-        // TODO: Replace with MockWorkflowFactory for Green
+        int depositAmount = 1;
+        Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account (), depositAmount);
         ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+        transferWorkflow.Deposit(Arg.Any<Transfer>()).Returns(new TransferResult(TransferStatus.Approved,  Array.Empty<TransferError>()));
+        
+        // SUT
         TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
 
         // Act
@@ -30,9 +33,14 @@ public class TransactionTests
     public void Transfer_DepositZero_StatusCancelled()
     {
         // Arrange
-        Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account(), 0);
-        // TODO: Replace with MockWorkflowFactory for Green
+        int depositAmount = 0;
+        TransferError depositZeroError = new TransferError("Invalid deposit amount");
+        Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account(), depositAmount);
         ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+        transferWorkflow.Deposit(Arg.Any<Transfer>()).Returns(new TransferResult
+        (TransferStatus.Cancelled,  new List<TransferError> { depositZeroError}));
+        
+        // SUT
         TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
 
         // Act
@@ -41,6 +49,7 @@ public class TransactionTests
         // Assert
         Assert.NotNull(transferResult);
         Assert.NotEmpty(transferResult.Errors);
+        Assert.Equal(depositZeroError, transferResult.Errors[0]);
         Assert.Equal(TransferStatus.Cancelled, transferResult.Status);
     }
 
@@ -49,13 +58,15 @@ public class TransactionTests
     public void Transfer_ValidWithdrawalAmount_StatusApproved()
     {
         // Arrange
-        Transfer transferWithdrawal = new Transfer(TransferType.Withdrawal, new Account { Balance = 200}, 200);
-        // TODO: Replace with MockWorkflowFactory for Green
+        Transfer transferWithdraw = new Transfer(TransferType.Withdraw, new Account { Balance = 200}, 200);
         ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+        transferWorkflow.Withdraw(Arg.Any<Transfer>()).Returns(new TransferResult(TransferStatus.Approved,  Array.Empty<TransferError>()));
+        
+        // SUT
         TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
 
         // Act
-        TransferResult transferResult = transferAutomation.InitiateTransfer(transferWithdrawal);
+        TransferResult transferResult = transferAutomation.InitiateTransfer(transferWithdraw);
 
         // Assert
         Assert.NotNull(transferResult);
@@ -68,13 +79,18 @@ public class TransactionTests
     public void Transfer_InvalidWithdrawalAmount_StatusCancelled()
     {
         // Arrange
-        Transfer transferWithdrawal = new Transfer(TransferType.Withdrawal, new Account { Balance = 200 }, 201);
-        // TODO: Replace with MockWorkflowFactory for Green
+        int withdrawalAmount = 201;
+        int currBalance = 200;
+        TransferError overdraftError = new TransferError("Invalid withdrawal amount, not enough funds");
+        Transfer transferWithdraw = new Transfer(TransferType.Withdraw, new Account { Balance = currBalance }, withdrawalAmount);
         ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+        transferWorkflow.Withdraw(Arg.Any<Transfer>()).Returns(new TransferResult(TransferStatus.Cancelled,  new List<TransferError> {overdraftError} ));
+        
+        // SUT
         TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
 
         // Act
-        TransferResult transferResult = transferAutomation.InitiateTransfer(transferWithdrawal);
+        TransferResult transferResult = transferAutomation.InitiateTransfer(transferWithdraw);
 
         // Assert
         Assert.NotNull(transferResult);
