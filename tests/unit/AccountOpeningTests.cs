@@ -1,4 +1,4 @@
-using NSubstitute;
+﻿using NSubstitute;
 using Bank4Us.AccountOpening;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -93,8 +93,7 @@ public class AccountOpeningTests
     public void ValidateIdentificationNumber_ValidSSN_StatusApproved()
     {
         // Arrange
-        // TODO: Replace with MockWorkflowFactory and ApplicantBuilder for Green
-        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
         Applicant applicant = ApplicantFactory.CreateValid();
         // SUT
         AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
@@ -116,8 +115,10 @@ public class AccountOpeningTests
         // Arrange
         ValidationError invalidIdError = new ValidationError("Invalid SSN format"); // Exact expected from reqs
         Applicant applicant = new ApplicantBuilder().SetIDNumber("FAKE-SSN-NUM").Build();
-        // TODO: Replace with MockWorkflowFactory for Green
-        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
+        accountWorkFlow.ValidateIdentificationNumber(Arg.Any<Applicant>())
+            .Returns(new List<ValidationError> { invalidIdError });
+            
         // SUT
         AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
 
@@ -144,8 +145,7 @@ public class AccountOpeningTests
     {
         // Arrange
         Applicant applicant = new ApplicantBuilder().SetOpeningDeposit(depositAmount).Build();
-        // TODO: Replace with MockWorkflowFactory for Green
-        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
 
         // SUT
         AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
@@ -165,9 +165,11 @@ public class AccountOpeningTests
     {
         // Arrange
         int depositAmount = 199; // BVA
+        ValidationError invalidDepositError = new ValidationError("Invalid opening deposit");
         Applicant applicant = new ApplicantBuilder().SetOpeningDeposit(depositAmount).Build();
-        // TODO: Replace with MockWorkflowFactory for Green
-        IAccountOpeningWorkflow accountWorkFlow = Substitute.For<IAccountOpeningWorkflow>();
+        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
+        accountWorkFlow.Process(Arg.Any<Applicant>())
+            .Returns(new ProcessResult(ApplicationStatus.Cancelled, new List<ValidationError> { invalidDepositError }));
 
         // SUT
         AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
@@ -178,6 +180,7 @@ public class AccountOpeningTests
         //Assert
         Assert.NotNull(processResult);
         Assert.NotEmpty(processResult.Errors);
+        Assert.Equal(invalidDepositError, processResult.Errors[0]);
         Assert.Equal(ApplicationStatus.Cancelled, processResult.Status);
     }
 
