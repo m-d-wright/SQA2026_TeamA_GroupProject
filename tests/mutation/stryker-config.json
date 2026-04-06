@@ -1,0 +1,14 @@
+{
+  "stryker-config": {
+    "reporters": ["html", "progress"],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 40
+    },
+    "mutate" : [
+      "**/Domains/*.cs"
+    ],
+    "concurrency": 1
+  }
+}
