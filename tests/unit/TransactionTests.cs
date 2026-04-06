@@ -95,6 +95,7 @@ public class TransactionTests
         // Assert
         Assert.NotNull(transferResult);
         Assert.NotEmpty(transferResult.Errors);
+        Assert.Equal(overdraftError, transferResult.Errors[0]);
         Assert.Equal(TransferStatus.Cancelled, transferResult.Status);
     }
 }
