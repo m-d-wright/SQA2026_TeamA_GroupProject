@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\bank4us\bank4Us.csproj" />
+    <ProjectReference Include="..\..\bank4us\bank4us.csproj" />
 	  <!--- BDD step definitions and .feature files -->
     <Compile Include="..\bdd\**\*.cs" Link="bdd\%(RecursiveDir)%(Filename)%(Extension)" />
     <None Include="..\bdd\**\*.feature" Link="bdd\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
