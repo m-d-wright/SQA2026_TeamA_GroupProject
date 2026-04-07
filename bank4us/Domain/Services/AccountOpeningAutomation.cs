@@ -1,6 +1,6 @@
-﻿using bank4us.Domain.DomainObjects;
+﻿using Bank4Us.Domain.DomainObjects;
 
-namespace bank4us.Domain.Services
+namespace Bank4Us.Domain.Services
 {
     // ---------------------------
     // Workflow Mock Seam (Interface)

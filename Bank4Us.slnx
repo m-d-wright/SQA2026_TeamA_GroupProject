@@ -2,5 +2,5 @@
   <Folder Name="/tests/">
     <Project Path="tests/unit/unit.csproj" />
   </Folder>
-  <Project Path="bank4us/bank4us.csproj"/>
+  <Project Path="bank4us/bank4us.csproj" DisplayName="Bank4Us" />
 </Solution>

@@ -1,4 +1,4 @@
-﻿namespace bank4us.Domain.DomainObjects
+﻿namespace Bank4Us.Domain.DomainObjects
 {
 
     public enum ApplicationStatus

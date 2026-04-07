@@ -1,5 +1,5 @@
-using bank4us.Domain.Services;
-using bank4us.Domain.DomainObjects;
+using Bank4Us.Domain.Services;
+using Bank4Us.Domain.DomainObjects;
 using NSubstitute;
 
 namespace unit;
