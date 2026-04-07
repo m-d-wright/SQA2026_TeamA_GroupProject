@@ -126,6 +126,9 @@ public class AccountOpeningTests
         Assert.NotNull(processResult);
         Assert.Empty(processResult.Errors);
         Assert.Equal(ApplicationStatus.Approved, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
     }
 
     /* Test T2 */
@@ -178,6 +181,9 @@ public class AccountOpeningTests
         Assert.NotNull(processResult);
         Assert.Empty(processResult.Errors);
         Assert.Equal(ApplicationStatus.Approved, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
     }
 
     /* Test T5*/
@@ -203,8 +209,38 @@ public class AccountOpeningTests
         Assert.NotEmpty(processResult.Errors);
         Assert.Equal(invalidDepositError, processResult.Errors[0]);
         Assert.Equal(ApplicationStatus.Cancelled, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
     }
 
+    [Fact]
+    public void Run_IDErrorsInvalid_ValidateAddressNotReceived()
+    {
+
+        // Arrange
+        ValidationError invalidIdError = new ValidationError("Invalid SSN format"); // Exact expected from reqs
+        Applicant applicant = new ApplicantBuilder().SetIDNumber("FAKE-SSN-NUM").Build();
+        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
+        accountWorkFlow.ValidateIdentificationNumber(Arg.Any<Applicant>())
+            .Returns(new List<ValidationError> {});
+            
+        // SUT
+        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
+
+        // Act
+        ProcessResult processResult = sut.Run(applicant);
+
+        // Assert - Expected SUT behavior
+        Assert.NotNull(processResult);
+        Assert.NotEqual(ApplicationStatus.Incomplete, processResult.Status);
+        Assert.Empty(processResult.Errors);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).ValidateAddress(applicant);
+
+    }
+    
     [Fact]
     public void AccountOpeningAutomation_ThrowsArgumentNull_WhenWorkflowIsNull()
     {
