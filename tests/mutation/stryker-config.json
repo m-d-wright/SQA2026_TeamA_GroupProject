@@ -7,7 +7,7 @@
       "break": 40
     },
     "mutate" : [
-      "**/Domains/*.cs"
+      "**/Domain/**/*.cs"
     ],
     "concurrency": 1
   }

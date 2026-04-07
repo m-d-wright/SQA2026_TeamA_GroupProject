@@ -1,47 +1,7 @@
-using System;
-using System.Collections.Generic;
+﻿using bank4us.Domain.DomainObjects;
 
-namespace Bank4Us.Transaction
+namespace bank4us.Domain.Services
 {
-    // ---------------------------
-    // Domain Models & Enumerations
-    // ---------------------------
-    public enum TransferStatus
-    {
-        Approved,
-        Cancelled
-    }
-
-    public enum TransferType
-    {
-        Deposit,
-        Withdraw
-    }
-
-    public enum AccountType
-    {
-        Checking,
-        Savings
-    }
-
-    public sealed record AccountHolder(string Name, int Age);
-
-    public sealed class Account
-    {
-        public AccountType AccountType {get; init;} = AccountType.Checking;
-
-        public AccountHolder? AccountHolder {get; init;}
-
-        public int Balance {get; set;} = 0;
-        
-    }
-
-    public sealed record Transfer(TransferType Type, Account Account, int amount);
-
-    public sealed record TransferError(string message);
-
-    public sealed record TransferResult(TransferStatus Status, IReadOnlyList<TransferError> Errors);
-
     // ---------------------------
     // Workflow Mock Seam (Interface)
     // ---------------------------
@@ -50,7 +10,7 @@ namespace Bank4Us.Transaction
     /// The domain workflow contract that tests will mock using NSubstitute.
     /// Students do NOT implement this in Lab 2; they only substitute it.
     /// </summary>
-    
+
     public interface ITransferWorkflow
     {
         TransferResult Deposit(Transfer transfer);
@@ -69,7 +29,8 @@ namespace Bank4Us.Transaction
 
         public TransferResult InitiateTransfer(Transfer transfer)
         {
-            if (transfer.Type == TransferType.Deposit) {
+            if (transfer.Type == TransferType.Deposit)
+            {
                 return _workflow.Deposit(transfer);
             }
             else if (transfer.Type == TransferType.Withdraw)

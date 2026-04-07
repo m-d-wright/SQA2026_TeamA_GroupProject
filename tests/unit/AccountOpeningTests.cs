@@ -1,6 +1,7 @@
 ﻿using NSubstitute;
-using Bank4Us.AccountOpening;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using bank4us.Domain.DomainObjects;
+using bank4us.Domain.Services;
+using NSubstitute.Core;
 
 namespace unit;
 
@@ -64,6 +65,26 @@ public class AccountOpeningTests
 
     }
 
+    /* Applicant factory */
+    public static class ApplicantFactory
+    {
+        /// <summary>
+        /// Provides a canonical, valid applicant for tests.
+        /// Tests can override individual properties to drive specific scenarios.
+        /// </summary>
+        public static Applicant CreateValid() => new()
+        {
+            IdentifierType = IdentifierType.SSN,
+            IdentificationNumber = "123-45-6789",
+            Address = new Address("123 Main St", "Milwaukee", "WI", "53202"),
+            CitizenshipStatus = CitizenshipStatus.Citizen,
+            OpeningDepositAmount = 200m,
+            HasResidencyDocument = true
+        };
+    }
+
+
+    /* Workflow factory for creating Workflows */
     public class MockWorkflowFactory
     {
         public IAccountOpeningWorkflow CreateValid() 
@@ -184,4 +205,11 @@ public class AccountOpeningTests
         Assert.Equal(ApplicationStatus.Cancelled, processResult.Status);
     }
 
+    [Fact]
+    public void AccountOpeningAutomation_ThrowsArgumentNull_WhenWorkflowIsNull()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(
+            () => new AccountOpeningAutomation(workflow: null));
+        Assert.Equal("workflow", ex.ParamName);
+    }
 }
