@@ -94,8 +94,8 @@ public class AccountOpeningTests
             
             // Valid ValidateAddress
             accountWorkFlow.ValidateAddress(Arg.Any<Applicant>())
-                .Returns(new ProcessResult(ApplicationStatus.Approved, 
-                new List<ValidationError> { new ValidationError("None") }));
+                .Returns(new ProcessResult(ApplicationStatus.Approved,
+                Array.Empty<ValidationError>()));
             
             // Valid EvaluateCitizenship mock
             accountWorkFlow.EvaluateCitizenship(Arg.Any<Applicant>())
@@ -157,7 +157,9 @@ public class AccountOpeningTests
 
         // Assert - Mocked objects were involved/not involved
         accountWorkFlow.Received(1).ValidateIdentificationNumber(applicant);
-        accountWorkFlow.DidNotReceive().ValidateAddress(applicant);
+        accountWorkFlow.DidNotReceiveWithAnyArgs().ValidateAddress(Arg.Any<Applicant>());
+        accountWorkFlow.DidNotReceiveWithAnyArgs().EvaluateCitizenship(Arg.Any<Applicant>());
+        accountWorkFlow.DidNotReceiveWithAnyArgs().Process(Arg.Any<Applicant>());
 
     }
 
@@ -214,6 +216,8 @@ public class AccountOpeningTests
         accountWorkFlow.Received(1).Process(applicant);
     }
 
+    /* Mutation killing tests */
+
     [Fact]
     public void Run_IDErrorsInvalid_ValidateAddressNotReceived()
     {
@@ -223,7 +227,7 @@ public class AccountOpeningTests
         Applicant applicant = new ApplicantBuilder().SetIDNumber("FAKE-SSN-NUM").Build();
         IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
         accountWorkFlow.ValidateIdentificationNumber(Arg.Any<Applicant>())
-            .Returns(new List<ValidationError> {});
+            .Returns(Array.Empty<ValidationError>());
             
         // SUT
         AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
@@ -238,14 +242,15 @@ public class AccountOpeningTests
 
         // Assert - Mocked objects were involved/not involved
         accountWorkFlow.Received(1).ValidateAddress(applicant);
-
     }
     
     [Fact]
-    public void AccountOpeningAutomation_ThrowsArgumentNull_WhenWorkflowIsNull()
+    public void AccountOpeningAutomation_WorkflowIsNull_ThrowsArgumentNull()
     {
         var ex = Assert.Throws<ArgumentNullException>(
             () => new AccountOpeningAutomation(workflow: null));
         Assert.Equal("workflow", ex.ParamName);
+        
     }
+
 }
