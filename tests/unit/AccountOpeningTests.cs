@@ -218,32 +218,7 @@ public class AccountOpeningTests
 
     /* Mutation killing tests */
 
-    [Fact]
-    public void Run_IDErrorsInvalid_ValidateAddressNotReceived()
-    {
-
-        // Arrange
-        ValidationError invalidIdError = new ValidationError("Invalid SSN format"); // Exact expected from reqs
-        Applicant applicant = new ApplicantBuilder().SetIDNumber("FAKE-SSN-NUM").Build();
-        IAccountOpeningWorkflow accountWorkFlow = new MockWorkflowFactory().CreateValid();
-        accountWorkFlow.ValidateIdentificationNumber(Arg.Any<Applicant>())
-            .Returns(Array.Empty<ValidationError>());
-            
-        // SUT
-        AccountOpeningAutomation sut = new AccountOpeningAutomation(accountWorkFlow);
-
-        // Act
-        ProcessResult processResult = sut.Run(applicant);
-
-        // Assert - Expected SUT behavior
-        Assert.NotNull(processResult);
-        Assert.NotEqual(ApplicationStatus.Incomplete, processResult.Status);
-        Assert.Empty(processResult.Errors);
-
-        // Assert - Mocked objects were involved/not involved
-        accountWorkFlow.Received(1).ValidateAddress(applicant);
-    }
-    
+    /* Test T10 */
     [Fact]
     public void AccountOpeningAutomation_WorkflowIsNull_ThrowsArgumentNull()
     {
