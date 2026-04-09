@@ -1,14 +1,17 @@
 {
   "stryker-config": {
-    "reporters": ["html", "progress"],
+    "reporters": ["html", "progress", "json"],
     "thresholds": {
       "high": 80,
       "low": 60,
       "break": 40
     },
+    "project": "bank4us.csproj",
+    "test-runner": "mtp",
+    "solution": "../../Bank4Us.slnx",
     "mutate" : [
-      "**/Domains/*.cs"
+      "**/Domain/**/*.cs"
     ],
-    "concurrency": 1
+    "verbosity": "info"
   }
 }

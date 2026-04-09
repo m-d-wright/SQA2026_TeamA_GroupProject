@@ -23,6 +23,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\bank4us\bank4us.csproj" />
+	  <!--- BDD step definitions and .feature files -->
+    <Compile Include="..\bdd\**\*.cs" Link="bdd\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="..\bdd\**\*.feature" Link="bdd\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Stryker mutation script and config-->
+    <None Include="..\mutation\**\*.json" Link="mutation\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\mutation\**\*.ps1" Link="mutation\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

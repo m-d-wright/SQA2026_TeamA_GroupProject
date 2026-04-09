@@ -1,6 +1,7 @@
 ﻿using NSubstitute;
-using Bank4Us.AccountOpening;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Bank4Us.Domain.DomainObjects;
+using Bank4Us.Domain.Services;
+using NSubstitute.Core;
 
 namespace unit;
 
@@ -64,6 +65,26 @@ public class AccountOpeningTests
 
     }
 
+    /* Applicant factory */
+    public static class ApplicantFactory
+    {
+        /// <summary>
+        /// Provides a canonical, valid applicant for tests.
+        /// Tests can override individual properties to drive specific scenarios.
+        /// </summary>
+        public static Applicant CreateValid() => new()
+        {
+            IdentifierType = IdentifierType.SSN,
+            IdentificationNumber = "123-45-6789",
+            Address = new Address("123 Main St", "Milwaukee", "WI", "53202"),
+            CitizenshipStatus = CitizenshipStatus.Citizen,
+            OpeningDepositAmount = 200m,
+            HasResidencyDocument = true
+        };
+    }
+
+
+    /* Workflow factory for creating Workflows */
     public class MockWorkflowFactory
     {
         public IAccountOpeningWorkflow CreateValid() 
@@ -73,8 +94,8 @@ public class AccountOpeningTests
             
             // Valid ValidateAddress
             accountWorkFlow.ValidateAddress(Arg.Any<Applicant>())
-                .Returns(new ProcessResult(ApplicationStatus.Approved, 
-                new List<ValidationError> { new ValidationError("None") }));
+                .Returns(new ProcessResult(ApplicationStatus.Approved,
+                Array.Empty<ValidationError>()));
             
             // Valid EvaluateCitizenship mock
             accountWorkFlow.EvaluateCitizenship(Arg.Any<Applicant>())
@@ -105,6 +126,9 @@ public class AccountOpeningTests
         Assert.NotNull(processResult);
         Assert.Empty(processResult.Errors);
         Assert.Equal(ApplicationStatus.Approved, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
     }
 
     /* Test T2 */
@@ -133,7 +157,9 @@ public class AccountOpeningTests
 
         // Assert - Mocked objects were involved/not involved
         accountWorkFlow.Received(1).ValidateIdentificationNumber(applicant);
-        accountWorkFlow.DidNotReceive().ValidateAddress(applicant);
+        accountWorkFlow.DidNotReceiveWithAnyArgs().ValidateAddress(Arg.Any<Applicant>());
+        accountWorkFlow.DidNotReceiveWithAnyArgs().EvaluateCitizenship(Arg.Any<Applicant>());
+        accountWorkFlow.DidNotReceiveWithAnyArgs().Process(Arg.Any<Applicant>());
 
     }
 
@@ -157,6 +183,9 @@ public class AccountOpeningTests
         Assert.NotNull(processResult);
         Assert.Empty(processResult.Errors);
         Assert.Equal(ApplicationStatus.Approved, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
     }
 
     /* Test T5*/
@@ -182,6 +211,21 @@ public class AccountOpeningTests
         Assert.NotEmpty(processResult.Errors);
         Assert.Equal(invalidDepositError, processResult.Errors[0]);
         Assert.Equal(ApplicationStatus.Cancelled, processResult.Status);
+
+        // Assert - Mocked objects were involved/not involved
+        accountWorkFlow.Received(1).Process(applicant);
+    }
+
+    /* Mutation killing tests */
+
+    /* Test T10 */
+    [Fact]
+    public void AccountOpeningAutomation_WorkflowIsNull_ThrowsArgumentNull()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(
+            () => new AccountOpeningAutomation(workflow: null));
+        Assert.Equal("workflow", ex.ParamName);
+        
     }
 
 }

@@ -8,6 +8,7 @@ param(
 $CurrentDir = Get-Location
 $ConfigPath = Join-Path $CurrentDir $ConfigFile
 $ResolvedTestPath = Resolve-Path -Path $TestProjectPath
+$TestProjPath = Join-Path $ResolvedTestPath "unit.csproj"
 
 # Report output path
 $OutputDir = Join-Path $CurrentDir "results"
@@ -38,4 +39,8 @@ Write-Host "Running Stryker with config: $ConfigPath" -ForegroundColor Cyan
 Write-Host "Test project: $ResolvedTestPath" -ForegroundColor Cyan
 
 # Run mutation testing on unit tests
-Set-Location "$ResolvedTestPath"; dotnet stryker --config-file "$ConfigPath" --output "$UniqueOutputDir" --open-report; Set-Location "$CurrentDir"
+Set-Location "$ResolvedTestPath"; `
+dotnet stryker --config-file "$ConfigPath" `
+--output "$UniqueOutputDir" --test-project `
+"$TestProjPath" --open-report; `
+Set-Location "$CurrentDir"

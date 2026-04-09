@@ -1,5 +1,5 @@
-using Bank4Us.AccountOpening;
-using Bank4Us.Transaction;
+using Bank4Us.Domain.Services;
+using Bank4Us.Domain.DomainObjects;
 using NSubstitute;
 
 namespace unit;
