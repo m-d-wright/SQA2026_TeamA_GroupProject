@@ -23,7 +23,7 @@ namespace unit
         {
             int depositAmount = 1;
             Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account(), depositAmount);
-            ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+            ITransactionWorkflow transferWorkflow = Substitute.For<ITransactionWorkflow>();
             transferWorkflow.Deposit(Arg.Any<Transfer>()).Returns(new TransferResult(TransferStatus.Approved, Array.Empty<TransferError>()));
 
             _scenarioContext["transferWorkflow"] = transferWorkflow;
@@ -33,11 +33,11 @@ namespace unit
         [When("I make the deposit")]
         public void WhenIMakeTheDeposit()
         {
-            ITransferWorkflow transferWorkflow = (ITransferWorkflow)_scenarioContext["transferWorkflow"];
+            ITransactionWorkflow transferWorkflow = (ITransactionWorkflow)_scenarioContext["transferWorkflow"];
             Transfer transferDeposit = (Transfer)_scenarioContext["transferDeposit"];
 
-            TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
-            TransferResult transferResult = transferAutomation.InitiateTransfer(transferDeposit);
+            TransactionAutomation transactionAutomation = new TransactionAutomation(transferWorkflow);
+            TransferResult transferResult = transactionAutomation.InitiateTransfer(transferDeposit);
 
             _scenarioContext["transferResult"] = transferResult;
         }
@@ -59,7 +59,7 @@ namespace unit
             int depositAmount = 0;
             TransferError depositZeroError = new TransferError("Invalid deposit amount");
             Transfer transferDeposit = new Transfer(TransferType.Deposit, new Account(), depositAmount);
-            ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+            ITransactionWorkflow transferWorkflow = Substitute.For<ITransactionWorkflow>();
             transferWorkflow.Deposit(Arg.Any<Transfer>()).Returns(new TransferResult
             (TransferStatus.Cancelled, new List<TransferError> { depositZeroError }));
 
@@ -94,7 +94,7 @@ namespace unit
             Account account = (Account)_scenarioContext["account"];
 
             Transfer transferWithdraw = new Transfer(TransferType.Withdraw, account, 200);
-            ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+            ITransactionWorkflow transferWorkflow = Substitute.For<ITransactionWorkflow>();
             transferWorkflow.Withdraw(Arg.Any<Transfer>()).Returns(new TransferResult(TransferStatus.Approved, Array.Empty<TransferError>()));
 
             _scenarioContext["transferWorkflow"] = transferWorkflow;
@@ -104,11 +104,11 @@ namespace unit
         [When("I make the withdrawl")]
         public void WhenIMakeTheWithdrawl()
         {
-            ITransferWorkflow transferWorkflow = (ITransferWorkflow)_scenarioContext["transferWorkflow"];
+            ITransactionWorkflow transferWorkflow = (ITransactionWorkflow)_scenarioContext["transferWorkflow"];
             Transfer transferWithdraw = (Transfer)_scenarioContext["transferWithdraw"];
 
-            TransferAutomation transferAutomation = new TransferAutomation(transferWorkflow);
-            TransferResult transferResult = transferAutomation.InitiateTransfer(transferWithdraw);
+            TransactionAutomation transactionAutomation = new TransactionAutomation(transferWorkflow);
+            TransferResult transferResult = transactionAutomation.InitiateTransfer(transferWithdraw);
 
             _scenarioContext["transferResult"] = transferResult;
         }
@@ -130,7 +130,7 @@ namespace unit
             TransferError overdraftError = new TransferError("Invalid withdrawal amount, not enough funds");
 
             Transfer transferWithdraw = new Transfer(TransferType.Withdraw, account, 201);
-            ITransferWorkflow transferWorkflow = Substitute.For<ITransferWorkflow>();
+            ITransactionWorkflow transferWorkflow = Substitute.For<ITransactionWorkflow>();
             transferWorkflow.Withdraw(Arg.Any<Transfer>()).Returns(
                 new TransferResult(TransferStatus.Cancelled, new List<TransferError> { overdraftError }));
 

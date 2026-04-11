@@ -11,18 +11,18 @@ namespace Bank4Us.Domain.Services
     /// Students do NOT implement this in Lab 2; they only substitute it.
     /// </summary>
 
-    public interface ITransferWorkflow
+    public interface ITransactionWorkflow
     {
         TransferResult Deposit(Transfer transfer);
         TransferResult Withdraw(Transfer transfer);
     }
 
 
-    public sealed class TransferAutomation
+    public sealed class TransactionAutomation
     {
-        private readonly ITransferWorkflow _workflow;
+        private readonly ITransactionWorkflow _workflow;
 
-        public TransferAutomation(ITransferWorkflow workflow)
+        public TransactionAutomation(ITransactionWorkflow workflow)
         {
             _workflow = workflow ?? throw new ArgumentNullException(nameof(workflow));
         }
